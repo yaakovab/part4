@@ -8,10 +8,7 @@ const api = supertest(app)
 
 beforeEach(async () => {
     await Blog.deleteMany({})
-    for (let blog of testHelper.initialBlogs) {
-        let blogObject = new Blog(blog)
-        await blogObject.save()
-    }
+    await Blog.insertMany(testHelper.initialBlogs)
 }, 1000000)
 
 
@@ -72,6 +69,32 @@ test('when title or url missing in blog issus 400 code', async () => {
     }
 
     await api.post('/api/blogs').send(blogObject).expect(400)
+})
+
+
+test('a blog can be deleted', async () => {
+    const response = await api.get('/api/blogs')
+    const idOfBlogToDelete = response.body[0].id
+
+    await api.delete(`/api/blogs/${idOfBlogToDelete}`).expect(204)
+
+    const responseAtEnd = await api.get('/api/blogs')
+    expect(responseAtEnd.body).toHaveLength(testHelper.initialBlogs.length - 1)
+})
+
+test('can update number of likes of a specific blog', async () => {
+    const blogsAtStart = await testHelper.blogsInDb()
+    const noteToUpdate = blogsAtStart[0]
+
+    // const blogObject = {
+    //     ...noteToUpdate,
+    //     likes: 25,
+    // }
+
+    await api.put(`/api/blogs/${noteToUpdate.id}`).send({ likes: 25 })
+
+    const blogsAtEnd = await testHelper.blogsInDb()
+    expect(blogsAtEnd[0].likes).toBe(25)
 })
 
 afterAll(() => {
