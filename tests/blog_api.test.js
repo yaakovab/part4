@@ -86,10 +86,7 @@ test('can update number of likes of a specific blog', async () => {
     const blogsAtStart = await testHelper.blogsInDb()
     const noteToUpdate = blogsAtStart[0]
 
-    // const blogObject = {
-    //     ...noteToUpdate,
-    //     likes: 25,
-    // }
+
 
     await api.put(`/api/blogs/${noteToUpdate.id}`).send({ likes: 25 })
 
