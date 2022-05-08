@@ -11,3 +11,8 @@ Content-Type: application/json
     "name": "Joy rid",
     "password" : "secret"
 }
+
+
+###
+
+GET http://localhost:3003/api/users

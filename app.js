@@ -12,7 +12,7 @@ const mongoose = require('mongoose')
 
 
 const url = config.MONGODB_URI
-
+console.log(config.MONGODB_URI)
 logger.info('connectint to', url)
 
 mongoose.connect(url)

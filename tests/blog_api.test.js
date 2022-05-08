@@ -2,7 +2,9 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const testHelper = require('./test_helper')
+const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
@@ -93,6 +95,78 @@ test('can update number of likes of a specific blog', async () => {
     const blogsAtEnd = await testHelper.blogsInDb()
     expect(blogsAtEnd[0].likes).toBe(25)
 })
+
+describe('testing the addition of new user to users db', () => {
+    beforeEach(async () => {
+        await User.deleteMany({})
+
+        const passwordHash = await bcrypt.hash('secret', 10)
+        const user = new User({
+            name: "L. B. Games",
+            username: "lbg",
+            passwordHash,
+        })
+
+        await user.save()
+    })
+
+    test('adding new user throgh api succeeds', async () => {
+        const usersAtStart = await testHelper.usersInDb()
+
+        const newUser = {
+            name: "G.W.Boosh",
+            password: 'potus',
+            username: 'gwbsh'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(201)
+            .expect('Content-Type', /json/)
+
+        const usersAtEnd = await testHelper.usersInDb()
+
+        expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).toContain(newUser.username)
+    })
+
+
+    test('adding new user fails when there is no password', async () => {
+        const usersAtStart = await testHelper.usersInDb()
+
+        const result = await api
+            .post('/api/users')
+            .send({ username: 'defd' })
+            .expect(400)
+            .expect('Content-Type', /json/)
+
+        expect(result.body.error).toContain('username or password are missing')
+
+        const usersAtEnd = await testHelper.usersInDb()
+
+        expect(usersAtEnd).toEqual(usersAtStart)
+    })
+
+    test('adding new user fails when there is no username', async () => {
+        const usersAtStart = await testHelper.usersInDb()
+
+        const result = await api
+            .post('/api/users')
+            .send({ password: 'defd' })
+            .expect(400)
+            .expect('Content-Type', /json/)
+
+        expect(result.body.error).toContain('username or password are missing')
+
+        const usersAtEnd = await testHelper.usersInDb()
+
+        expect(usersAtEnd).toEqual(usersAtStart)
+    })
+
+})
+
 
 afterAll(() => {
     mongoose.connection.close()
