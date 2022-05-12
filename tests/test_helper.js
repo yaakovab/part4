@@ -1,5 +1,7 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 const emptyList = []
 
@@ -72,7 +74,8 @@ const initialBlogs = [
         author: "Robert C. Martin",
         url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
         likes: 0,
-        __v: 0
+        __v: 0,
+        user: "6277a687d6432e195d4e9c34"
     },
     {
         _id: "5a422bc61b54a676234d17fc",
@@ -80,9 +83,12 @@ const initialBlogs = [
         author: "Robert C. Martin",
         url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
         likes: 2,
-        __v: 0
+        __v: 0,
+        user: "6277a687d6432e195d4e9c34"
     }
 ]
+
+const tokenForPost = jwt.sign({ username: "lbg", id: "6277a687d6432e195d4e9c34" }, process.env.SECRET)
 
 const blogsInDb = async () => {
     const blogs = await Blog.find({})
@@ -95,5 +101,5 @@ const usersInDb = async () => {
 }
 
 module.exports = {
-    emptyList, oneBlogList, multipleBlogsList, initialBlogs, blogsInDb, usersInDb,
+    emptyList, oneBlogList, multipleBlogsList, initialBlogs, blogsInDb, usersInDb, tokenForPost
 }

@@ -6,6 +6,7 @@ const User = require('../models/user')
 const testHelper = require('./test_helper')
 const bcrypt = require('bcrypt')
 
+
 const api = supertest(app)
 
 beforeEach(async () => {
@@ -36,18 +37,28 @@ test('id field in blog object is defined', async () => {
 })
 
 
-test('new blogs are added correctly', async () => {
+test('new blogs with a correct token are added correctly', async () => {
     const blogObject = testHelper.multipleBlogsList[0]
+
     await api
         .post('/api/blogs')
+        .set('Authorization', 'Bearer ' + testHelper.tokenForPost)
         .send(blogObject)
         .expect(201)
 
-    const response = await api.get('/api/blogs')
-    const titles = response.body.map(b => b.title)
+    const blogsAtStart = await testHelper.blogsInDb()
+    const titles = blogsAtStart.map(b => b.title)
 
-    expect(response.body).toHaveLength(testHelper.initialBlogs.length + 1)
+    expect(blogsAtStart).toHaveLength(testHelper.initialBlogs.length + 1)
     expect(titles).toContain('React patterns')
+})
+
+test('gets status code 401 when posting a new blog without a token', async () => {
+    const blogObject = testHelper.multipleBlogsList[1]
+    await api
+        .post('/api/blogs')
+        .send(blogObject)
+        .expect(401)
 })
 
 
@@ -58,11 +69,15 @@ test('when likes not specified in blog it default to 0', async () => {
         url: 'http://TSMicro',
     }
 
-    await api.post('/api/blogs').send(blogObject)
-    const response = await api.get('/api/blogs')
+    await api
+        .post('/api/blogs')
+        .set('Authorization', 'Bearer ' + testHelper.tokenForPost)
+        .send(blogObject)
+
+    const blogsAtEnd = await testHelper.blogsInDb()
 
 
-    expect(response.body[response.body.length - 1].likes).toBe(0)
+    expect(blogsAtEnd[blogsAtEnd.length - 1].likes).toBe(0)
 })
 
 test('when title or url missing in blog issus 400 code', async () => {
@@ -70,7 +85,11 @@ test('when title or url missing in blog issus 400 code', async () => {
         author: 'Micheal Knowels',
     }
 
-    await api.post('/api/blogs').send(blogObject).expect(400)
+    await api.
+        post('/api/blogs')
+        .set('Authorization', 'bearer ' + testHelper.tokenForPost)
+        .send(blogObject)
+        .expect(400)
 })
 
 
