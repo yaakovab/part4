@@ -75,13 +75,18 @@ test('when title or url missing in blog issus 400 code', async () => {
 
 
 test('a blog can be deleted', async () => {
-    const response = await api.get('/api/blogs')
-    const idOfBlogToDelete = response.body[0].id
+    const blogsAtStart = await testHelper.blogsInDb()
+    console.log(blogsAtStart)
+    const idOfBlogToDelete = blogsAtStart[0].id
+
 
     await api.delete(`/api/blogs/${idOfBlogToDelete}`).expect(204)
 
-    const responseAtEnd = await api.get('/api/blogs')
-    expect(responseAtEnd.body).toHaveLength(testHelper.initialBlogs.length - 1)
+    const blogsAtEnd = await testHelper.blogsInDb()
+    const titles = blogsAtEnd.map(blog => blog.title)
+
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+    expect(titles).not.toContain(blogsAtStart[0].title)
 })
 
 test('can update number of likes of a specific blog', async () => {

@@ -1,0 +1,19 @@
+
+GET http://localhost:3003/api/blogs
+
+###
+
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpyaWQiLCJpZCI6IjYyNzE0NzhiOWY1Mzc4MTc0NDViNjIxZCIsImlhdCI6MTY1MjEwMTY5Mn0.1jaM3-rBXOZbVvot8gQaihPArdxgVy3jyDhWUXpegRI
+
+{
+    "title" : "preparing to Apoclypce",
+    "url" : "http://apocalypce.com",
+    "author" : "Pasimist"
+}
+
+###
+
+DELETE http://localhost:3003/api/blogs/6278f78d16e5026ac6de51ac
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpyaWQiLCJpZCI6IjYyNzE0NzhiOWY1Mzc4MTc0NDViNjIxZCIsImlhdCI6MTY1MjM1MjYxOX0.CgguQ6zUFduR5JX19vQ3_c0dpxmvclt8Lcf8x1wzgmo
