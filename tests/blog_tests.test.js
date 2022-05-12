@@ -52,3 +52,13 @@ describe('favorite blog tests', () => {
         expect(listHelper.favoriteBlog(testHelper.emptyList)).toBeNull()
     })
 })
+
+test('returns the author with most blogs', () => {
+    const blogs = testHelper.multipleBlogsList
+    expect(listHelper.mostBlogs(blogs)).toEqual({ author: "Robert C. Martin", max: 3 })
+})
+
+test('returns the writer with most likes', () => {
+    const blogs = testHelper.multipleBlogsList
+    expect(listHelper.mostLikes(blogs)).toEqual({ author: "Edsger W. Dijkstra", max: 17 })
+})
